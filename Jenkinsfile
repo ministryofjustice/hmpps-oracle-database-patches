@@ -95,7 +95,7 @@ pipeline {
         dir( project.config ) {
           git url: 'git@github.com:ministryofjustice/' + project.config, branch: env.GIT_BRANCH.split(/\//)[1], credentialsId: 'f44bc5f1-30bd-4ab9-ad61-cc32caf1562a'
         }
-        dir( project.d_man_dep ) {
+        dir( project.oracle_patch ) {
           git url: 'git@github.com:ministryofjustice/' + project.oracle_patch, branch: env.GIT_BRANCH.split(/\//)[1], credentialsId: 'f44bc5f1-30bd-4ab9-ad61-cc32caf1562a'
         }
         dir( project.oracle_vars ) {
