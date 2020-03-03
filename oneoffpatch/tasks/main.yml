@@ -1,9 +1,9 @@
 ---
   
-- name: (main) Load in Oracle Environment Variables
+- name: (main) Load in Oracle Environment Variables when Filename Supplied
   include_vars:
      file: "{{ oracle_vars }}"
-  tags: always
+  when: oracle_vars is defined
 
 - name: (main) Report Patch ID
   debug:
