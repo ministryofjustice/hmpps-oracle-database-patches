@@ -25,6 +25,11 @@
      msg: "Definition of Patch {{ install_patch_id }} must be configured in the Environments Repository"
   when: install_patch_id is defined and required_patches[install_patch_id] is not defined
 
+- name: (main) Create Initial Alt New Patch Dictionary
+  set_fact:
+          alt_required_patches: "{{ required_patches }}"
+
+
 - name: (main) Setup Initial Dictionary of Patch Information
   block:
 
@@ -59,7 +64,7 @@
 
   - name: (main) Create Alternative New Patch Dictionary
     set_fact:
-            alt_required_patches: "{{ required_patches | combine(item) }}"
+            alt_required_patches: "{{ alt_required_patches | combine(item) }}"
     with_items: "{{ tmp_patches.results | map(attribute='ansible_facts.tmp_patch') | list }}"
 
 
