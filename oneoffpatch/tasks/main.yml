@@ -69,7 +69,7 @@
   debug: var=required_patches
 
   - name: What are Required Patches Now (Alt)
-  debug: var=alt_required_patches
+    debug: var=alt_required_patches
 
 # We run this block to identify and install any absent patches when there is a list of required patches
 # for this environment and we have specified install_absent_patches
