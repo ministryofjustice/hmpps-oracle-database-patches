@@ -57,10 +57,19 @@
             required_patches: "{{ required_patches | combine(item) }}"
     with_items: "{{ tmp_patches.results | map(attribute='ansible_facts.tmp_patch') | list }}"
 
+  - name: (main) Create Alternative New Patch Dictionary
+    set_fact:
+            alt_required_patches: "{{ required_patches | combine(item) }}"
+    with_items: "{{ tmp_patches.results | map(attribute='ansible_facts.tmp_patch') | list }}"
+
+
   when: required_patches is defined
 
 - name: What are Required Patches Now
   debug: var=required_patches
+
+  - name: What are Required Patches Now (Alt)
+  debug: var=alt_required_patches
 
 # We run this block to identify and install any absent patches when there is a list of required patches
 # for this environment and we have specified install_absent_patches
