@@ -16,7 +16,7 @@
 
 - name: (main) Get Dependencies Bucket
   set_fact:
-      dependencies_bucket_name: "{{ dependencies_bucket.arn }}"
+      dependencies_bucket_name: "{{ dependencies_bucket.name }}"
 
 - name: (main) Display Runtime Information
   debug:
