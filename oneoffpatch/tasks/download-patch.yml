@@ -1,14 +1,5 @@
 ---
 
-- name: Get dependencies bucket arn
-  shell: '. /etc/environment && echo ${DEPENDENCIES_BUCKET_ARN}'
-  register: dependencies_bucket_arn
-  changed_when: false
-
-- name: Set facts
-  set_fact:
-     dependencies_bucket_name: '{{ dependencies_bucket_arn.stdout[13:] }}'
-
 - name: Download patch {{ patch_number }}
   shell: 'aws s3 cp s3://{{ dependencies_bucket_name }}/dependencies/oracle/rdbms/{{ patch_file }} {{ oracle_patch_installer_directory }}'
   args:

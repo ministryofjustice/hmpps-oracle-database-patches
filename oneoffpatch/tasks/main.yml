@@ -5,10 +5,18 @@
      file: "{{ oracle_vars }}"
   when: oracle_vars is defined
 
+- name: (main) Load in Configuration Variables (these Provide Dependencies Bucket location)
+  include_vars:
+     file: "{{ config_vars }}"
+
 - name: (main) Report Patch ID
   debug:
      msg:  Patch ID                  {{ install_patch_id }}
   when: install_patch_id is defined
+
+- name: (main) Get Dependencies Bucket
+  set_fact:
+      dependencies_bucket_name: "{{ dependencies_bucket.arn }}"
 
 - name: (main) Display Runtime Information
   debug:
@@ -19,6 +27,7 @@
            Oracle Home               {{ oracle_database_oracle_home }}
            Grid Home                 {{ oracle_grid_oracle_home }}
            Patch Directory           {{ oracle_patch_installer_directory }}
+           Dependencies Bucket       {{ dependencies_bucket_name }}
 
 - name: Fail if Specific Patch ID Requested but Not Defined
   fail: 

@@ -68,6 +68,7 @@ def run_ansible(environment_name,target_host,patch_id,install_absent_patches) {
                   -i "/home/tools/data/hmpps-env-configs/${environment_name}/ansible" \
                   ./hmpps-oracle-database-patches/oneoffpatch.yml \
                   --extra-vars "oracle_vars=/home/tools/data/hmpps-delius-core-oracledb-bootstrap/vars/main.yml" \
+                  --extra-vars "config_vars=/home/tools/data/hmpps-env-configs/ansible/group_vars/all.yml" \
                   --extra-vars "install_absent_patches=${install_absent_patches}" \
                   --extra-vars "target_host=${target_host}" \
                   --extra-vars "environment_name=${environment_name}" \
