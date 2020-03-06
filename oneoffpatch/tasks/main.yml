@@ -16,7 +16,7 @@
 
 - name: (main) Get Dependencies Bucket
   set_fact:
-      dependencies_bucket_arn: "{{ dependencies_bucket.arn }}"
+      dependencies_bucket_name: "{{ dependencies_bucket.arn }}"
 
 - name: (main) Display Runtime Information
   debug:
@@ -27,7 +27,7 @@
            Oracle Home               {{ oracle_database_oracle_home }}
            Grid Home                 {{ oracle_grid_oracle_home }}
            Patch Directory           {{ oracle_patch_installer_directory }}
-           Dependencies Bucket       {{ dependencies_bucket_arn }}
+           Dependencies Bucket       {{ dependencies_bucket_name }}
 
 - name: Fail if Specific Patch ID Requested but Not Defined
   fail: 
