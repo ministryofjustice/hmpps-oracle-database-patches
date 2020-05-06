@@ -4,7 +4,9 @@
     set_fact:
         required_patches: "{{ required_patches|combine({item.key: {'install_request': true}}, recursive=true) }}"
     with_dict: "{{ required_patches }}"
-    when: install_patch_id is not defined
+    when: 
+       - install_patch_id is not defined
+       - ((item.value.grid_patch && item.value.grid_patch_version_compatible) || (item.value.database_patch && item.value.database_patch_version_compatible))
 
   - name: Enable Install Request for Specific Patch
     set_fact:
@@ -14,6 +16,8 @@
   - name: Get OPatch Inventory
     include_tasks: query-opatch.yml
 
+  # Find if the required patches have already been installed and flag them to be installed if
+  # (a) They are not already installed; and (b) They are compatible with the version of the Oracle Home
   - name: Find if Required Patches Have Already Been Installed
     include_tasks: check-installed.yml
     vars:
@@ -21,6 +25,8 @@
            patch_number: "{{item.value.patch_number}}"
            grid_patch: "{{item.value.grid_patch}}"
            database_patch: "{{item.value.database_patch}}"
+           grid_patch_version_compatible: "{{item.value.grid_patch_version_compatible}}"
+           database_patch_version_compatible: "{{item.value.database_patch_version_compatible}}"
     with_dict: "{{ required_patches }}"
     when: "item.value.install_request"
 
@@ -30,19 +36,19 @@
         patch_number: "{{item.value.patch_number}}"
         patch_file: "{{item.value.filename}}"
     with_dict: "{{ required_patches }}"
-    when: "item.value.install_request and ((item.value.grid_patch and not item.value.already_applied_to_grid) or (item.value.database_patch and not item.value.already_applied_to_database))"
+    when: "item.value.install_request and (item.value.install_to_grid_required or item.value.install_to_database_required)"
 
   - name: Initialize List of Grid Patching Requirements
     set_fact:
         grid_patching_list: [ false ]
 
   # Create a list of whether Grid needs patching (true or false) for all required patches.
-  # This will be if the patch install is requested, it is a Grid patch, and is has not already been installed.
+  # This will be if the patch install is requested, it is a Grid patch, is version compatible, and is has not already been installed.
   - name: Create List of Grid Patching Requirements
     set_fact:
           grid_patching_list: "{{ grid_patching_list + [ true ] }}"
     with_dict: "{{ required_patches }}"
-    when: item.value.install_request and item.value.grid_patch and not item.value.already_applied_to_grid
+    when: item.value.install_request and item.value.grid_patch and item.value.install_to_grid_required
      
   # Summarize whether we need to shutdown Grid - this is if any Grid patching is required
   - name: Set Grid Shutdown Needed
@@ -64,7 +70,7 @@
            {{ oracle_database_oracle_home }}/OPatch/opatch query {{ oracle_patch_installer_directory }}/{{ item.value.patch_number }} | grep "Need to shutdown Oracle instances" | cut -d: -f2
     register: tmp_database_shutdown_required
     with_dict: "{{ required_patches }}"
-    when: item.value.install_request and item.value.database_patch and not item.value.already_applied_to_database
+    when: item.value.install_request and item.value.database_patch and item.value.install_to_database_required
     changed_when: false
 
   - name: Update Dictionary with Database Shutdown Requirements
@@ -83,7 +89,7 @@
     set_fact:
           database_patching_list: "{{ database_patching_list + [ true ] }}"
     with_dict: "{{ required_patches }}" 
-    when: item.value.install_request and item.value.database_patch and not item.value.already_applied_to_database and item.value.shutdown_required 
+    when: item.value.install_request and item.value.database_patch and item.value.install_to_database_required and item.value.shutdown_required 
   
    # Summarize whether we need to shutdown Databases - this is if any Grid patching is required or if any Database patches require shutdown
   - name: Set Database Shutdown Needed

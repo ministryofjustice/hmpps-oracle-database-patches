@@ -18,14 +18,19 @@
   set_fact:
       dependencies_bucket_name: "{{ dependencies_bucket.name }}"
 
+- name: (main) Prepare Oracle Home Version Information
+  include: get-oracle-version.yml
+
 - name: (main) Display Runtime Information
   debug:
       msg: |
            Environment Name          {{ environment_name }}
            Target Host               {{ target_host }}
            Install Absent Patches    {{ install_absent_patches }}
-           Oracle Home               {{ oracle_database_oracle_home }}
+           Oracle DB Home            {{ oracle_database_oracle_home }}
+           Oracle DB Home Version    {{ oracle_database_version }}
            Grid Home                 {{ oracle_grid_oracle_home }}
+           Grid Version              {{ oracle_grid_version }}
            Patch Directory           {{ oracle_patch_installer_directory }}
            Dependencies Bucket       {{ dependencies_bucket_name }}
 
@@ -40,6 +45,9 @@
   # Dictionary Key is p<patchno>.  The leading p corresponds to
   # usage by Oracle in patch naming and avoids ansible problems handling
   # number/string conversion by forcing use of strings only for patch IDs.
+  # For backwards compatibility, the default target version for patches is 11.2.0.4 unless otherwise specified.
+  # (Typically an exact point version should be supplied, e.g. 11.2.0.4 but regular expressions may be used if needed
+  #  for patches applicable to multiple point versions, e.g. 11.2..*)
   - name: (main) Show Starting Dictionary
     debug: var=required_patches
 
@@ -50,12 +58,17 @@
                              {'filename':item.value.filename,
                               'patch_number':item.key.split("p")[1],
                               'description':item.value.description,
+                              'target_version':item.value.target_version|default('11.2.0.4'),
                               'postinstall':item.value.postinstall_sql | default('none'),
                               'grid_patch':item.value.grid_patch,
                               'database_patch':item.value.database_patch,
+                              'grid_patch_version_compatible':{{ oracle_grid_version }} is search(item.value.target_version|default('11.2.0.4')),
+                              'database_patch_version_compatible':{{ oracle_database_version }} is search(item.value.target_version|default('11.2.0.4')),
                               'install_request': false,
                               'already_applied_to_grid': true,
                               'already_applied_to_database': true,
+                              'install_to_grid_required':false,
+                              'install_to_database_required':false,
                               'shutdown_required': true}} 
                        }}
     with_dict: "{{ required_patches }}"
@@ -94,10 +107,10 @@
      include_tasks: install-patches.yml
      vars:
         patch_number: "{{ item.value.patch_number }}"
-        apply_to_database: "{{ item.value.database_patch and not item.value.already_applied_to_database }}"
-        apply_to_grid: "{{ item.value.grid_patch and not item.value.already_applied_to_grid }}"
+        apply_to_database: "{{ item.value.install_to_database_required }}"
+        apply_to_grid: "{{ item.value.install_to_grid_required }}"
      with_dict: "{{ required_patches }}"
-     when: item.value.install_request and ((item.value.grid_patch and not item.value.already_applied_to_grid) or (item.value.database_patch and not item.value.already_applied_to_database))
+     when: item.value.install_request and ((item.value.install_to_grid_required) or (item.value.install_to_database_required))
 
    - name: (main) Restart Grid
      include_tasks: restart-grid.yml
@@ -113,7 +126,7 @@
         patch_number: "{{ item.value.patch_number }}"
         postinstall_sql: "{{ item.value.postinstall }}"
      with_dict: "{{ required_patches }}"
-     when: item.value.install_request and item.value.database_patch and not item.value.already_applied_to_database and item.value.postinstall != 'none'
+     when: item.value.install_request and item.value.install_to_database_required and item.value.postinstall != 'none'
 
    - name: (main) Stop Blackout on Patching Targets
      include_tasks: manage-blackout.yml
@@ -139,6 +152,8 @@
               patch_number: "{{item.value.patch_number}}"
               grid_patch: "{{item.value.grid_patch}}"
               database_patch: "{{item.value.database_patch}}"
+              grid_patch_version_compatible: "{{item.value.grid_patch_version_compatible}}"
+              database_patch_version_compatible: "{{item.value.database_patch_version_compatible}}"
       with_dict: "{{ required_patches }}"
 
     - name: (main) Initialise List of Missing Grid Patches
@@ -152,7 +167,7 @@
       set_fact:
             missing_grid_patches: "{{ missing_grid_patches + [item.key] }}"
       with_dict: "{{ required_patches }}"
-      when:  "item.value.grid_patch and not item.value.already_applied_to_grid"
+      when:  "item.value.install_to_grid_required"
 
     - name: (main) Fail if any Grid Patches are absent and we have not specified a specific patch number
       fail:
@@ -167,7 +182,7 @@
       set_fact:
           missing_database_patches: "{{ missing_database_patches + [item.key] }}"
       with_dict: "{{ required_patches }}"
-      when:  "item.value.database_patch and not item.value.already_applied_to_database"
+      when:  "item.value.install_to_database_required"
 
     - name: (main) Fail if any Database Patches are absent and we have not specified a specific patch number
       fail:
