@@ -4,6 +4,7 @@
   shell: |
         . ~oracle/.bash_profile
         {{ oracle_grid_oracle_home }}/bin/sqlplus -v | sed '/^\s*$/d'
+  changed_when: false
   register: get_grid_version
 
 - name: Set Oracle Grid Version
@@ -14,6 +15,7 @@
   shell: |
         . ~oracle/.bash_profile
         {{ oracle_database_oracle_home }}/bin/sqlplus -v | sed '/^\s*$/d'
+  changed_when: false
   register: get_database_version
 
 - name: Set Oracle Database Version

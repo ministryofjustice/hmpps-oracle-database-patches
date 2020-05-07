@@ -1,9 +1,36 @@
 ---
-  
+
+# When patching we need to know the Oracle Home for the Grid Infrastructure and Database Components,
+# as well as the directory to be used for Oracle patch downloads.  This information is defined
+# in the vars directory of the hmpps-delius-core-oracledb-bootstrap repository in a vars file
+# dependent on the grid/database combination.
+# For example:
+#   main.yml  - 11g Grid; 11g Database
+#   main11.yml - 19g Grid; 11g Database
+#   main18.yml - 19g Grid; 18c Database
+#   main19.yml - 19g Grid; 19c Database
+
+# If we pass in the location of the hmpps-delius-oracledb-bootstrap repository then dynamically
+# determine the versions of Grid and Database in use and hence which vars file to use.
+# This is done by supplying oracle_vars_dir as the (local) path to the repository.
+- name: (main) Load in Oracle Environment Variables when Directory Supplied
+  include: set-oracle-paths.yml
+  when: oracle_vars_dir is defined
+
+# Alternatively, use oracle_vars to manually specify exactly which vars file to use
+# (This should include the full local path)
 - name: (main) Load in Oracle Environment Variables when Filename Supplied
   include_vars:
      file: "{{ oracle_vars }}"
   when: oracle_vars is defined
+
+# If neither oracle_vars_dir nor oracle_vars has been supplied then we can assume that we are in
+# boostrap and these variables have therefore already been set.   Check we have values before progressing.
+- assert:
+    that:
+       - oracle_grid_oracle_home is defined
+       - oracle_database_oracle_home is defined
+       - oracle_patch_installer_directory is defined
 
 - name: (main) Load in Configuration Variables (these Provide Dependencies Bucket location)
   include_vars:
@@ -62,8 +89,8 @@
                               'postinstall':item.value.postinstall_sql | default('none'),
                               'grid_patch':item.value.grid_patch,
                               'database_patch':item.value.database_patch,
-                              'grid_patch_version_compatible':{{ oracle_grid_version }} is search(item.value.target_version|default('11.2.0.4')),
-                              'database_patch_version_compatible':{{ oracle_database_version }} is search(item.value.target_version|default('11.2.0.4')),
+                              'grid_patch_version_compatible':oracle_grid_version is search(item.value.target_version|default('11.2.0.4')),
+                              'database_patch_version_compatible':oracle_database_version is search(item.value.target_version|default('11.2.0.4')),
                               'install_request': false,
                               'already_applied_to_grid': true,
                               'already_applied_to_database': true,
@@ -88,6 +115,9 @@
 
    - name: (main) Prepare Patch Information
      include: build-patching-requirements.yml
+
+   - name: Show the Required Patches
+     debug: var=required_patches
 
    - name: (main) Start Blackout on Patching Targets to be Shutdown
      include_tasks: manage-blackout.yml

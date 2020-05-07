@@ -6,7 +6,7 @@
     with_dict: "{{ required_patches }}"
     when: 
        - install_patch_id is not defined
-       - ((item.value.grid_patch && item.value.grid_patch_version_compatible) || (item.value.database_patch && item.value.database_patch_version_compatible))
+       - ((item.value.grid_patch and item.value.grid_patch_version_compatible) or (item.value.database_patch and item.value.database_patch_version_compatible))
 
   - name: Enable Install Request for Specific Patch
     set_fact:
