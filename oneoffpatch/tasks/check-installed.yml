@@ -7,11 +7,6 @@
   changed_when: false 
   when: grid_patch | bool
 
-- name: Set Patch Already Installed on Grid
-  set_fact:
-     required_patches: "{{ required_patches|combine({patch_id: {'already_applied_to_grid': grid_patch_present.stdout | bool}}, recursive=true) }}"
-  when: (grid_patch | bool) 
-
 - name: Set Patch Required on Grid
   set_fact:
      required_patches: "{{ required_patches|combine({patch_id: {'install_to_grid_required': not (grid_patch_present.stdout | bool) }}, recursive=true) }}"
@@ -25,11 +20,6 @@
   register: database_patch_present
   changed_when: false
   when: database_patch | bool
-
-- name: Set Patch Already Installed on Database
-  set_fact:
-     required_patches: "{{ required_patches|combine({patch_id: {'already_applied_to_database': database_patch_present.stdout | bool}}, recursive=true) }}"
-  when: (database_patch | bool)
   
 - name: Set Patch Required on Database
   set_fact:

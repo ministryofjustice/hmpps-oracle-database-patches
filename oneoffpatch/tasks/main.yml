@@ -92,8 +92,6 @@
                               'grid_patch_version_compatible':oracle_grid_version is search(item.value.target_version|default('11.2.0.4')),
                               'database_patch_version_compatible':oracle_database_version is search(item.value.target_version|default('11.2.0.4')),
                               'install_request': false,
-                              'already_applied_to_grid': true,
-                              'already_applied_to_database': true,
                               'install_to_grid_required':false,
                               'install_to_database_required':false,
                               'shutdown_required': true}} 
