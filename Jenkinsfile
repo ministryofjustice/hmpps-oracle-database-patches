@@ -67,7 +67,7 @@ def run_ansible(environment_name,target_host,patch_id,install_absent_patches) {
                   ansible-playbook -u hmpps_integration_test \
                   -i "/home/tools/data/hmpps-env-configs/${environment_name}/ansible" \
                   ./hmpps-oracle-database-patches/oneoffpatch.yml \
-                  --extra-vars "oracle_vars=/home/tools/data/hmpps-delius-core-oracledb-bootstrap/vars/main.yml" \
+                  --extra-vars "oracle_vars_dir=/home/tools/data/hmpps-delius-core-oracledb-bootstrap/vars" \
                   --extra-vars "config_vars=/home/tools/data/hmpps-env-configs/ansible/group_vars/all.yml" \
                   --extra-vars "install_absent_patches=${install_absent_patches}" \
                   --extra-vars "target_host=${target_host}" \
