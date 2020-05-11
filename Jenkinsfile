@@ -81,7 +81,7 @@ def run_ansible(environment_name,target_host,patch_id,install_absent_patches) {
 
 pipeline {
 
-  agent { label "jenkins_slave" }
+  agent { label "oracle_ops" }
 
   parameters {
     choice(name: 'environment_name', choices: environments, description: 'Select environment')
