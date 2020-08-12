@@ -7,6 +7,14 @@
   changed_when: false
   register: get_grid_version
 
+- name: Debug
+  debug:
+    var=oracle_grid_oracle_home
+
+- name: Debug
+  debug:
+    var=get_grid_version
+
 - name: Set Oracle Grid Version
   set_fact:
      oracle_grid_version: "{{ get_grid_version.stdout_lines[-1] | regex_replace('^.* ([\\d\\.]+) .*$','\\1') }}"
