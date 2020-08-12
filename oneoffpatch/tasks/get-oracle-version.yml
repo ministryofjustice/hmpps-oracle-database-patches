@@ -9,7 +9,7 @@
 
 - name: Set Oracle Grid Version
   set_fact:
-     oracle_grid_version: "{{ get_grid_version.stdout_lines[-1] | regex_replace('^.* ([\\d\\.]+) .*$','\\1') }}"
+     oracle_grid_version: "{{ get_grid_version.stdout_lines[-1] | regex_replace('^.* ([\\d\\.]+)($|\\s+.*$)','\\1') }}"
 
 - name: Get Oracle Database Version
   shell: |
@@ -20,4 +20,4 @@
 
 - name: Set Oracle Database Version
   set_fact:
-     oracle_database_version: "{{ get_database_version.stdout_lines[-1] | regex_replace('^.* ([\\d\\.]+) .*$','\\1') }}"
+     oracle_database_version: "{{ get_database_version.stdout_lines[-1] | regex_replace('^.* ([\\d\\.]+)($|\\s+.*$)','\\1') }}"
