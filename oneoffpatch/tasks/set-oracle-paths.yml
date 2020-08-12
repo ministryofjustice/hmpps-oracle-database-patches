@@ -50,6 +50,10 @@
   set_fact:
      oracle_vars_file: "{{ get_potential_grid_config_files.files | intersect(get_potential_database_config_files.files) }}"
 
+- name: Debug
+  debug:
+     var=oracle_vars_file
+
 # We should have only identified one Oracle configuration file
 - assert:
      that: oracle_vars_file | length == 1
