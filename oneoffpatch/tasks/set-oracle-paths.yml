@@ -7,7 +7,6 @@
 - debug:
     msg:
       - "{{ oracle_vars_dir }}"
-      - "{{ config_vars }}"
 
 - name: Get ASM Path from OraTab
   shell: |
