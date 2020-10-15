@@ -35,7 +35,8 @@
      patterns: "*.yml"
      contains: "oracle_grid_oracle_home.*{{ asm_version_component }}.*"
   register: get_potential_grid_config_files
-  #delegate_to: localhost
+  connection: local
+  delegate_to: localhost
   become: false
 
 # There are potentially multiple config files with this particular version of Database
@@ -45,8 +46,14 @@
      patterns: "*.yml"
      contains: "oracle_database_oracle_home.*{{ database_version_component }}.*"
   register: get_potential_database_config_files
-  #delegate_to: localhost
+  connection: local
+  delegate_to: localhost
   become: false
+
+- debug:
+    msg:
+      - "{{ get_potential_grid_config_files }}"
+      - "{{ get_potential_database_config_files }}"
 
 # However, there should only be one config file matching this version of GI
 # and this version of Database
