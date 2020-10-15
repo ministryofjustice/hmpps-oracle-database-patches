@@ -14,6 +14,8 @@
   changed_when: false
   register: get_asmpath
 
+- debug: var=get_asmpath
+
 - name: Set ASM Path Version Component
   set_fact:
      asm_version_component: "{{ get_asmpath.stdout_lines[-1] | regex_replace('.*/([\\d\\.]+)/.*','\\1') }}"
