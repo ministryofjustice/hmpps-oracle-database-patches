@@ -4,6 +4,11 @@
   # to use to determine Oracle Home paths and patch locations
   # relevant to the specific versions of Grid and Database currently in use.
 
+- debug:
+    msg:
+      - "{{ oracle_vars_dir }}"
+      - "{{ config_vars }}"
+
 - name: Get ASM Path from OraTab
   shell: |
          egrep -e "^\+ASM" /etc/oratab | awk '{print $1}'
@@ -31,7 +36,7 @@
      patterns: "*.yml"
      contains: "oracle_grid_oracle_home.*{{ asm_version_component }}.*"
   register: get_potential_grid_config_files
-  delegate_to: localhost
+  #delegate_to: localhost
   become: false
 
 # There are potentially multiple config files with this particular version of Database
@@ -41,7 +46,7 @@
      patterns: "*.yml"
      contains: "oracle_database_oracle_home.*{{ database_version_component }}.*"
   register: get_potential_database_config_files
-  delegate_to: localhost
+  #delegate_to: localhost
   become: false
 
 # However, there should only be one config file matching this version of GI
