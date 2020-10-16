@@ -30,6 +30,9 @@
   set_fact:
      database_version_component: "{{ get_databasepath.stdout_lines[-1] | regex_replace('.*/([\\d\\.]+)/.*','\\1') }}"
 
+- debug: 
+    msg: "Debug start"
+
 # There are potentially multiple config files with this particular version of GI
 - name: Get Potential Grid Config Variable Files
   local_action:
