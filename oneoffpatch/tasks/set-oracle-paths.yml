@@ -4,17 +4,11 @@
   # to use to determine Oracle Home paths and patch locations
   # relevant to the specific versions of Grid and Database currently in use.
 
-- debug:
-    msg:
-      - "{{ oracle_vars_dir }}"
-
 - name: Get ASM Path from OraTab
   shell: |
          egrep -e "^\+ASM" /etc/oratab | awk '{print $1}'
   changed_when: false
   register: get_asmpath
-
-- debug: var=get_asmpath
 
 - name: Set ASM Path Version Component
   set_fact:
@@ -30,35 +24,27 @@
   set_fact:
      database_version_component: "{{ get_databasepath.stdout_lines[-1] | regex_replace('.*/([\\d\\.]+)/.*','\\1') }}"
 
-- debug: 
-    msg: "Debug start"
+# Copy the oracle_vars_dir directory to standby host 
+- name: Copy oracle_vars_dir directory from localhost to standby host
+  copy: 
+    src: "{{ oracle_vars_dir }}"
+    dest: "/tmp{{ oracle_vars_dir }}"
 
 # There are potentially multiple config files with this particular version of GI
 - name: Get Potential Grid Config Variable Files
-  local_action:
-     module: find 
-     paths: "{{ oracle_vars_dir }}"
+  find:
+     paths: "/tmp{{ oracle_vars_dir }}"
      patterns: "*.yml"
      contains: "oracle_grid_oracle_home.*{{ asm_version_component }}.*"
   register: get_potential_grid_config_files
-  run_once: True
-  become: false
 
 # There are potentially multiple config files with this particular version of Database
 - name: Get Potential Database Config Variable Files
-  local_action:
-     module: find 
-     paths: "{{ oracle_vars_dir }}"
+  find:
+     paths: "/tmp{{ oracle_vars_dir }}"
      patterns: "*.yml"
      contains: "oracle_database_oracle_home.*{{ database_version_component }}.*"
   register: get_potential_database_config_files
-  run_once: True
-  become: false
-
-- debug:
-    msg:
-      - "{{ get_potential_grid_config_files }}"
-      - "{{ get_potential_database_config_files }}"
 
 # However, there should only be one config file matching this version of GI
 # and this version of Database
@@ -72,8 +58,8 @@
 
 - name: Show Configuration File we have picked to use
   debug: 
-      msg: "Using Oracle Configuration File {{ oracle_vars_file[0].path }}"
+      msg: "Using Oracle Configuration File {{ oracle_vars_dir}}/{{ oracle_vars_file[0].path | basename }}"
 
 - name: Load in Oracle Environment Variables
   include_vars:
-     file: "{{ oracle_vars_file[0].path }}"
+     file: "{{ oracle_vars_dir}}/{{ oracle_vars_file[0].path | basename }}"
