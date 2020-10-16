@@ -32,24 +32,24 @@
 
 # There are potentially multiple config files with this particular version of GI
 - name: Get Potential Grid Config Variable Files
-  find: 
+  local_action:
+     module: find 
      paths: "{{ oracle_vars_dir }}"
      patterns: "*.yml"
      contains: "oracle_grid_oracle_home.*{{ asm_version_component }}.*"
   register: get_potential_grid_config_files
-  connection: local
-  delegate_to: localhost
+  run_once: True
   become: false
 
 # There are potentially multiple config files with this particular version of Database
 - name: Get Potential Database Config Variable Files
-  find: 
+  local_action:
+     module: find 
      paths: "{{ oracle_vars_dir }}"
      patterns: "*.yml"
      contains: "oracle_database_oracle_home.*{{ database_version_component }}.*"
   register: get_potential_database_config_files
-  connection: local
-  delegate_to: localhost
+  run_once: True
   become: false
 
 - debug:
