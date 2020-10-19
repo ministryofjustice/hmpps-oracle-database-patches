@@ -1,5 +1,10 @@
 ---
 
+- name: Set fact to define install_patch_id only when parameter patch_id is not empty
+  set_fact:
+    install_patch_id: patch_id
+  when: patch_id | default('') != ''
+
 # When patching we need to know the Oracle Home for the Grid Infrastructure and Database Components,
 # as well as the directory to be used for Oracle patch downloads.  This information is defined
 # in the vars directory of the hmpps-delius-core-oracledb-bootstrap repository in a vars file
