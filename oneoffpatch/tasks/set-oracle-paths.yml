@@ -50,21 +50,16 @@
 # and this version of Database
 - name: Determine Oracle Variables Config File Name
   set_fact:
-     oracle_vars_file: "{{ get_potential_grid_config_files.files | intersect(get_potential_database_config_files.files) }}"
+     oracle_vars_file: "{{ get_potential_grid_config_files.files | map(attribute='path') | list | intersect( get_potential_database_config_files.files | map(attribute='path') | list ) }}"
 
-- debug:
-    msg: 
-      - "{{ get_potential_grid_config_files }}"
-      - "{{ get_potential_database_config_files }}"
-      - "{{ oracle_vars_file }}"
 # We should have only identified one Oracle configuration file
 - assert:
      that: oracle_vars_file | length == 1
 
 - name: Show Configuration File we have picked to use
   debug: 
-      msg: "Using Oracle Configuration File {{ oracle_vars_dir}}/{{ oracle_vars_file[0].path | basename }}"
+      msg: "Using Oracle Configuration File {{ oracle_vars_dir}}/{{ oracle_vars_file[0]| basename }}"
 
 - name: Load in Oracle Environment Variables
   include_vars:
-     file: "{{ oracle_vars_dir}}/{{ oracle_vars_file[0].path | basename }}"
+     file: "{{ oracle_vars_dir}}/{{ oracle_vars_file[0] | basename }}"
