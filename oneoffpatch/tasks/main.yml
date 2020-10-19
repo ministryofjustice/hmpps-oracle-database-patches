@@ -35,7 +35,7 @@
 - name: (main) Load in Configuration Variables (these Provide Dependencies Bucket location)
   include_vars:
      file: "{{ config_vars }}"
-
+     
 - name: (main) Report Patch ID
   debug:
      msg:  Patch ID                  {{ install_patch_id }}
