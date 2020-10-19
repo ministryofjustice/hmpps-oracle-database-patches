@@ -32,6 +32,10 @@
        - oracle_database_oracle_home is defined
        - oracle_patch_installer_directory is defined
 
+- name: (main) Load in Configuration Variables (these Provide Dependencies Bucket location)
+  include_vars:
+     file: "{{ config_vars }}"
+     
 - name: (main) Report Patch ID
   debug:
      msg:  Patch ID                  {{ install_patch_id }}
