@@ -62,6 +62,9 @@
            Patch Directory           {{ oracle_patch_installer_directory }}
            Dependencies Bucket       {{ dependencies_bucket_name }}
 
+- name: Show Patches Required
+  debug: var=required_patches
+
 - name: Fail if Specific Patch ID Requested but Not Defined
   fail: 
      msg: "Definition of Patch {{ install_patch_id }} must be configured in the Environments Repository"
