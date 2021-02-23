@@ -177,14 +177,23 @@
 
   when: required_patches is defined and (install_absent_patches | bool | default(false))
 
+- name: Show Patches Required DEBUG#6
+  debug: var=required_patches
+
 # We run this block if there is a list of require patches and fail if any are absent
 # NB: This runs both when install_absent_patches is not true (reporting mode only)
 #     and also if install_absent_patches is true (confirmation of any installations performed)
 - name: (main) Reporting Block when Required Patches
   block:
 
+    - name: Show Patches Required DEBUG#7
+      debug: var=required_patches
+
     - name: (main) Update OPatch Inventory
       include_tasks: query-opatch.yml
+
+    - name: Show Patches Required DEBUG#8
+      debug: var=required_patches
 
     - name: (main) Find if Any Requested Patches Remain Uninstalled
       include_tasks: check-installed.yml
@@ -197,11 +206,14 @@
               database_patch_version_compatible: "{{item.value.database_patch_version_compatible}}"
       with_dict: "{{ required_patches }}"
 
+    - name: Show Patches Required DEBUG#9
+      debug: var=required_patches
+
     - name: (main) Initialise List of Missing Grid Patches
       set_fact:
             missing_grid_patches: []
 
-    - name: Show the Required Patches
+    - name: Show Patches Required DEBUG#10
       debug: var=required_patches
 
     - name: (main) Populate List of Missing Grid Patches
