@@ -34,6 +34,9 @@
 - name: Show Patches Required DEBUG#8D
   debug: var=required_patches
 
+- name: Show Patch ID
+  debug: var=patch_id
+
 - name: Set Patch Required on Database
   set_fact:
      required_patches: "{{ required_patches|combine({patch_id: {'install_to_database_required': not (database_patch_present.stdout | bool) }}, recursive=true) }}"
