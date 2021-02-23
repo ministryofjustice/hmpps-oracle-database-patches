@@ -121,11 +121,14 @@
 - name: (main) Installation Block when Required Patches are Defined and Install Required
   block:
 
+   - name: Show Patches Required DEBUG#4
+     debug: var=required_patches
+
    - name: (main) Prepare Patch Information
      include: build-patching-requirements.yml
 
-   - name: Show the Required Patches
-     debug: var=required_patches
+    - name: Show Patches Required DEBUG#5
+      debug: var=required_patches
 
    - name: (main) Start Blackout on Patching Targets to be Shutdown
      include_tasks: manage-blackout.yml
