@@ -17,6 +17,12 @@
 - name: Show Patches Required DEBUG#8B
   debug: var=required_patches
 
+- name: Show Patch ID
+  debug: var=patch_id
+
+- name: Show What We Got
+  debug: var=grid_patch_present
+
 - name: Set Patch Required on Grid
   set_fact:
      required_patches: "{{ required_patches|combine({patch_id: {'install_to_grid_required': not (grid_patch_present.stdout | bool) }}, recursive=true) }}"
@@ -24,7 +30,6 @@
      - grid_patch | bool 
      - grid_patch_version_compatible | bool 
      
-
 - name: Show Patches Required DEBUG#8C
   debug: var=required_patches
 
