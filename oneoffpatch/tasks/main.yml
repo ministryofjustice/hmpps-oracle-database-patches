@@ -1,14 +1,5 @@
 ---
 
-- name: Get Ansible
-  shell: |
-         ansible --version
-  register: getansible
-  changed_when: false
-
-- name: Show Ansible
-  debug: var=getansible.stdout
-
 - name: Set fact to define install_patch_id only when parameter patch_id is not empty
   set_fact:
     install_patch_id: patch_id
@@ -206,6 +197,16 @@
 
     - name: Show Ansible Version
       debug: var=ansible_version
+
+    - name: Get Ansible
+      shell: |
+            ansible --version
+      register: getansible
+      changed_when: false
+      delegate_to: localhost
+
+    - name: Show Ansible
+      debug: var=getansible.stdout
 
     # - name: (main) Find if Any Requested Patches Remain Uninstalled
     #   include_tasks: check-installed.yml
