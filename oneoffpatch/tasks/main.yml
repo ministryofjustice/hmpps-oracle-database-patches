@@ -62,7 +62,7 @@
            Patch Directory           {{ oracle_patch_installer_directory }}
            Dependencies Bucket       {{ dependencies_bucket_name }}
 
-- name: Show Patches Required
+- name: Show Patches Required DEBUG#1
   debug: var=required_patches
 
 - name: Fail if Specific Patch ID Requested but Not Defined
@@ -103,12 +103,18 @@
     with_dict: "{{ required_patches }}"
     register: tmp_patches
 
+  - name: Show Patches Required DEBUG#2
+    debug: var=required_patches
+
   - name: (main) Create New Patch Dictionary
     set_fact:
             required_patches: "{{ required_patches | combine(item) }}"
     with_items: "{{ tmp_patches.results | map(attribute='ansible_facts.tmp_patch') | list }}"
 
   when: required_patches is defined
+
+  - name: Show Patches Required DEBUG#3
+    debug: var=required_patches
 
 # We run this block to identify and install any absent patches when there is a list of required patches
 # for this environment and we have specified install_absent_patches
