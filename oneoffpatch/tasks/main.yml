@@ -204,6 +204,7 @@
       register: getansible
       changed_when: false
       delegate_to: localhost
+      become: no
 
     - name: Show Ansible
       debug: var=getansible.stdout
