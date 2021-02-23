@@ -195,6 +195,9 @@
     - name: Show Patches Required DEBUG#8
       debug: var=required_patches
 
+    - name: Show Ansible Version
+      debug: var=ansible_version
+
     - name: (main) Find if Any Requested Patches Remain Uninstalled
       include_tasks: check-installed.yml
       vars:
