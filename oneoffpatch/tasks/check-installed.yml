@@ -11,6 +11,9 @@
   changed_when: false 
   when: grid_patch | bool
 
+- name: Show What We Got
+  debug: var=grid_patch_present
+
 - name: Show Patches Required DEBUG#8B
   debug: var=required_patches
 
@@ -20,6 +23,7 @@
   when: 
      - grid_patch | bool 
      - grid_patch_version_compatible | bool 
+     
 
 - name: Show Patches Required DEBUG#8C
   debug: var=required_patches
@@ -36,6 +40,9 @@
 
 - name: Show Patch ID
   debug: var=patch_id
+
+- name: Show What We Got
+  debug: var=database_patch_present
 
 - name: Set Patch Required on Database
   set_fact:
