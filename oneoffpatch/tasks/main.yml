@@ -113,8 +113,8 @@
 
   when: required_patches is defined
 
-  - name: Show Patches Required DEBUG#3
-    debug: var=required_patches
+- name: Show Patches Required DEBUG#3
+  debug: var=required_patches
 
 # We run this block to identify and install any absent patches when there is a list of required patches
 # for this environment and we have specified install_absent_patches
