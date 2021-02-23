@@ -209,7 +209,7 @@
     #           database_patch_version_compatible: "{{item.value.database_patch_version_compatible}}"
     #   with_dict: "{{ required_patches }}"
 
-    - name: (main) Find if Any Requested Patches Remain Uninstalled
+    - name: (main) Loop to Find if Any Requested Patches Remain Uninstalled
       include_tasks: check-installed.yml
       vars:
               patch_id: "{{item.key}}"
