@@ -179,7 +179,24 @@
               testvar_id: "{{item.key}}"
               testvar_file: "{{item.value.filename}}"
       with_dict: "{{ required_patches }}"
-    
+
+    - name: (main) Find if Any Requested Patches Remain Uninstalled
+      include_tasks: check-installed.yml
+      vars:
+              patch_id: "{{item.key}}"
+              patch_number: "{{item.value.patch_number}}"
+              grid_patch: "{{item.value.grid_patch}}"
+              database_patch: "{{item.value.database_patch}}"
+              grid_patch_version_compatible: "{{item.value.grid_patch_version_compatible}}"
+              database_patch_version_compatible: "{{item.value.database_patch_version_compatible}}"
+      with_dict: "{{ required_patches }}"
+      
+    - include_tasks: show-testvar.yml
+      vars:
+              testvar_id: "{{item.key}}"
+              testvar_file: "{{item.value.filename}}"
+      with_dict: "{{ required_patches }}"
+
 
   when: required_patches is defined
 
