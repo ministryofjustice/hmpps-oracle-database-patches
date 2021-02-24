@@ -1,9 +1,9 @@
 
-- name: SHOW TESTVAR patch_id
-  debug: var=patch_id
+- name: SHOW TESTVAR testvar_id
+  debug: var=testvar_id
 
 - name: SHOW TESTVAR oracle_patch_id
   debug: var=oracle_patch_id
 
-- name: SHOW TESTVAR patch_number
-  debug: var=patch_number
+- name: SHOW TESTVAR testvar_file
+  debug: var=testvar_file

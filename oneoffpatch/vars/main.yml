@@ -1,2 +1,8 @@
 ---
 # vars file for hmpps-oracle-database-patches
+  vars:
+     testvar: 
+        aaa:
+           filename: aaa.txt
+        bbb:
+           filename: bbb.txt
