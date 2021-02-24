@@ -1,5 +1,11 @@
 ---
 
+- name: SHOW CHECK patch_id
+  debug: var=patch_id
+
+- name: SHOW CHECK patch_number
+  debug: var=patch_number
+
 - name: Check if patch {{ patch_number }} is installed on Grid Infrastructure
   shell: |
          grep -Ec "<patchID>{{ patch_number }}</patchID>" /tmp/grid_opatch_out.xml || [[ $? == 1 ]]

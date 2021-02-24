@@ -1,4 +1,6 @@
 
-- debug: var=testvar_id
+- name: SHOW TESTVAR testvar_id
+  debug: var=testvar_id
 
-- debug: var=testvar_file
+- name: SHOW TESTVAR testvar_file
+  debug: var=testvar_file
