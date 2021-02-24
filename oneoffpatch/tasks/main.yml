@@ -1,13 +1,4 @@
 ---
-  vars:
-     testvar: 
-        aaa:
-           filename: aaa.txt
-        bbb:
-           filename: bbb.txt
-  
-  tasks:
-     
     - include_tasks: show-testvar.yml
       vars:
               testvar_id: "{{item.key}}"
