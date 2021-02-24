@@ -3,4 +3,4 @@
       vars:
               testvar_id: "{{item.key}}"
               testvar_file: "{{item.value.filename}}"
-      with_dict: "{{ testvar }}"
+      with_dict: "{{ required_patches }}"
