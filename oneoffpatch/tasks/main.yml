@@ -195,6 +195,7 @@
     - include_tasks: show-testvar.yml
       vars:
               patch_id: "{{item.key}}"
+              oracle_patch_id: "{{item.key}}"
               patch_number: "{{item.value.patch_number}}"
       with_dict: "{{ required_patches }}"
 
