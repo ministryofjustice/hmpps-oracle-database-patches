@@ -1,9 +1,9 @@
 ---
 
-- name: Set fact to define install_patch_id only when parameter patch_id is not empty
+- name: Set fact to define install_patch_id only when parameter requested_patch_id is not empty
   set_fact:
-    install_patch_id: patch_id
-  when: patch_id | default('') != ''
+    install_patch_id: requested_patch_id
+  when: requested_patch_id | default('') != ''
 
 # When patching we need to know the Oracle Home for the Grid Infrastructure and Database Components,
 # as well as the directory to be used for Oracle patch downloads.  This information is defined
