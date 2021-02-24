@@ -165,8 +165,21 @@
 
   when: required_patches is defined and (install_absent_patches | bool | default(false))
 
-- include_tasks: show-testvar.yml
-  vars:
-          testvar_id: "{{item.key}}"
-          testvar_file: "{{item.value.filename}}"
-  with_dict: "{{ required_patches }}"
+# We run this block if there is a list of require patches and fail if any are absent
+# NB: This runs both when install_absent_patches is not true (reporting mode only)
+#     and also if install_absent_patches is true (confirmation of any installations performed)
+- name: (main) Reporting Block when Required Patches
+  block:
+
+    - name: (main) Update OPatch Inventory
+      include_tasks: query-opatch.yml
+
+    - include_tasks: show-testvar.yml
+      vars:
+              testvar_id: "{{item.key}}"
+              testvar_file: "{{item.value.filename}}"
+      with_dict: "{{ required_patches }}"
+    
+
+  when: required_patches is defined
+
