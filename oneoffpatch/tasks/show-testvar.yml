@@ -1,0 +1,4 @@
+
+- debug: var=testvar_id
+
+- debug: var=testvar_file
