@@ -176,8 +176,8 @@
 
     - include_tasks: show-testvar.yml
       vars:
-              testvar_id: "{{item.key}}"
-              testvar_file: "{{item.value.filename}}"
+              patch_id: "{{item.key}}"
+              patch_number: "{{item.value.patch_number}}"
       with_dict: "{{ required_patches }}"
 
     - name: (main) Find if Any Requested Patches Remain Uninstalled
@@ -193,8 +193,8 @@
       
     - include_tasks: show-testvar.yml
       vars:
-              testvar_id: "{{item.key}}"
-              testvar_file: "{{item.value.filename}}"
+              patch_id: "{{item.key}}"
+              patch_number: "{{item.value.patch_number}}"
       with_dict: "{{ required_patches }}"
 
 
