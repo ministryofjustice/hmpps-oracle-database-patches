@@ -1,36 +1,13 @@
 ---
 
-# Only Run Post Install SQL Script on Primary databases
-- name: Get Running Primary Databases in this Oracle Home
-  shell: |
-         export PATH=$PATH:/usr/local/bin; 
-         export ORACLE_SID=+ASM; 
-         export ORAENV_ASK=NO ; 
-         . oraenv >/dev/null; 
-         srvctl config database \
-         | xargs --verbose -I{} srvctl status database -d {} 2>&1 \
-         | paste - - \
-         | grep -v "Database is not running." \
-         | awk '{print $5}' \
-         | xargs --verbose -I{} srvctl config database -d {} 2>&1 \
-         | egrep "^Database instance:|^Database role" \
-         | paste - - \
-         | grep PRIMARY \
-         | awk '{print $NF}'
-  register: primary_db_list
-  changed_when: false
+# Only Run Datapatch on Primary databases
 
-# Run Post Install Patch as SYS User - May Need Modification in Future Patches but adequate for now
+# Run Post Install Patch SQL as SYS User - May Need Modification in Future Patches but adequate for now
 - name: Run Post Install for Patch {{ patch_number }}
   shell:  |
-          export PATH=$PATH:/usr/local/bin; 
-          export ORACLE_SID={{ sid_item }}; 
-          export ORAENV_ASK=NO ; 
-          . oraenv >/dev/null; 
+          . ~/.bash_profile
           cd {{ oracle_patch_installer_directory }}/{{ patch_number }}
           sqlplus -s /  as sysdba <<-EOF
           START {{ postinstall_sql }}
           EOF
-  with_items: "{{ primary_db_list.stdout_lines }}"
-  loop_control:
-    loop_var: sid_item
+  when: database_primary_sid is defined
