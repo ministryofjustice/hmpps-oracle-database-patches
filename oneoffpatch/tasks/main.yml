@@ -15,7 +15,7 @@
 #   main18.yml - 19g Grid; 18c Database
 #   main19.yml - 19g Grid; 19c Database
 
-# If we pass in the location of the hmpps-delius-oracledb-bootstrap repository then dynamically
+# If we pass in the location of the hmpps-delius-core-oracledb-bootstrap repository then dynamically
 # determine the versions of Grid and Database in use and hence which vars file to use.
 # This is done by supplying oracle_vars_dir as the (local) path to the repository.
 - name: (main) Load in Oracle Environment Variables when Directory Supplied
@@ -121,7 +121,7 @@
 
    - name: (main) Shutdown Databases
      include_tasks: shutdown-databases.yml
-     when: database_shutdown_needed
+     when: database_shutdown_needed or grid_shutdown_needed
 
    - name: (main) Shutdown Grid
      include_tasks: shutdown-grid.yml
@@ -142,7 +142,7 @@
 
    - name: (main) Restart Databases
      include_tasks: restart-databases.yml
-     when: database_shutdown_needed     
+     when: database_shutdown_needed or grid_shutdown_needed    
 
    - name: (main) Apply Post Install SQL for Patch
      include_tasks: run-postinstall.yml
