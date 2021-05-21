@@ -15,7 +15,7 @@
 #   main18.yml - 19g Grid; 18c Database
 #   main19.yml - 19g Grid; 19c Database
 
-# If we pass in the location of the hmpps-delius-oracledb-bootstrap repository then dynamically
+# If we pass in the location of the hmpps-delius-core-oracledb-bootstrap repository then dynamically
 # determine the versions of Grid and Database in use and hence which vars file to use.
 # This is done by supplying oracle_vars_dir as the (local) path to the repository.
 - name: (main) Load in Oracle Environment Variables when Directory Supplied
@@ -95,6 +95,7 @@
                               'install_request': false,
                               'install_to_grid_required':false,
                               'install_to_database_required':false,
+                              'datapatch_required':item.value.datapatch_required|default(false),
                               'shutdown_required': true}} 
                        }}
     with_dict: "{{ required_patches }}"
@@ -118,15 +119,9 @@
    - name: Show the Required Patches
      debug: var=required_patches
 
-   - name: (main) Start Blackout on Patching Targets to be Shutdown
-     include_tasks: manage-blackout.yml
-     vars:
-        blackout_action: start
-     when: grid_shutdown_needed or database_shutdown_needed
-
    - name: (main) Shutdown Databases
      include_tasks: shutdown-databases.yml
-     when: database_shutdown_needed
+     when: database_shutdown_needed or grid_shutdown_needed
 
    - name: (main) Shutdown Grid
      include_tasks: shutdown-grid.yml
@@ -147,7 +142,7 @@
 
    - name: (main) Restart Databases
      include_tasks: restart-databases.yml
-     when: database_shutdown_needed     
+     when: database_shutdown_needed or grid_shutdown_needed    
 
    - name: (main) Apply Post Install SQL for Patch
      include_tasks: run-postinstall.yml
@@ -157,11 +152,9 @@
      with_dict: "{{ required_patches }}"
      when: item.value.install_request and item.value.install_to_database_required and item.value.postinstall != 'none'
 
-   - name: (main) Stop Blackout on Patching Targets
-     include_tasks: manage-blackout.yml
-     vars:
-        blackout_action: stop
-     when: grid_shutdown_needed or database_shutdown_needed
+   - name: (main) Apply Datapatch
+     include_tasks: run-datapatch.yml
+     when: datapatch_needed
 
   when: required_patches is defined and (install_absent_patches | bool | default(false))
 
