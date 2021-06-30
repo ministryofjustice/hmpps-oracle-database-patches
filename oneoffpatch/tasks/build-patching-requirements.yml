@@ -27,6 +27,7 @@
            database_patch: "{{item.value.database_patch}}"
            grid_patch_version_compatible: "{{item.value.grid_patch_version_compatible}}"
            database_patch_version_compatible: "{{item.value.database_patch_version_compatible}}"
+           patch_to_replace: "{{item.value.replaces_patch}}"
     with_dict: "{{ required_patches }}"
     when: "item.value.install_request"
 
