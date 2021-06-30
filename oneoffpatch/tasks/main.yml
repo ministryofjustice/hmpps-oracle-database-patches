@@ -96,6 +96,9 @@
                               'install_to_grid_required':false,
                               'install_to_database_required':false,
                               'datapatch_required':item.value.datapatch_required|default(false),
+                              'replaces_patch':item.value.replaces_patch | default('none'),
+                              'grid_rollback_required': false,
+                              'database_rollback_required': false,
                               'shutdown_required': true}} 
                        }}
     with_dict: "{{ required_patches }}"
@@ -133,6 +136,9 @@
         patch_number: "{{ item.value.patch_number }}"
         apply_to_database: "{{ item.value.install_to_database_required }}"
         apply_to_grid: "{{ item.value.install_to_grid_required }}"
+        patch_to_rollback: "{{ item.value.replaces_patch }}"
+        rollback_from_database: "{{ item.value.database_rollback_required }}"
+        rollback_from_grid: "{{ item.value.rollback_from_grid }}" 
      with_dict: "{{ required_patches }}"
      when: item.value.install_request and ((item.value.install_to_grid_required) or (item.value.install_to_database_required))
 
@@ -176,6 +182,7 @@
               database_patch: "{{item.value.database_patch}}"
               grid_patch_version_compatible: "{{item.value.grid_patch_version_compatible}}"
               database_patch_version_compatible: "{{item.value.database_patch_version_compatible}}"
+              patch_to_replace: "{{item.value.replaces_patch}}"
       with_dict: "{{ required_patches }}"
 
     - name: (main) Initialise List of Missing Grid Patches
