@@ -76,6 +76,9 @@
   # For backwards compatibility, the default target version for patches is 11.2.0.4 unless otherwise specified.
   # (Typically an exact point version should be supplied, e.g. 11.2.0.4 but regular expressions may be used if needed
   #  for patches applicable to multiple point versions, e.g. 11.2..*)
+  # To find if a compatible version of a patch is defined for the current grid or database version we
+  # create a regular expression by joining all possible target_versions with pipes and try to match
+  # the current grid or database versions against that expression.
   - name: (main) Show Starting Dictionary
     debug: var=required_patches
 
@@ -83,15 +86,18 @@
     set_fact:
             tmp_patch: >
                       {{ {item.key:
-                             {'filename':item.value.filename,
-                              'patch_number':item.key.split("p")[1],
-                              'description':item.value.description,
-                              'target_version':item.value.target_version|default('11.2.0.4'),
+                             {'patch_number':item.key.split("p")[1],
+                              'description':item.value.description | default('no patch'),
+                              'grid_patch_filename':'undefined',
+                              'grid_patch_directory':oracle_patch_installer_directory,
+                              'database_patch_filename':'undefined',
+                              'database_patch_directory':oracle_patch_installer_directory,
+                              'patch_files':item.value.patch_files,
                               'postinstall':item.value.postinstall_sql | default('none'),
                               'grid_patch':item.value.grid_patch,
                               'database_patch':item.value.database_patch,
-                              'grid_patch_version_compatible':oracle_grid_version is search(item.value.target_version|default('11.2.0.4')),
-                              'database_patch_version_compatible':oracle_database_version is search(item.value.target_version|default('11.2.0.4')),
+                              'grid_patch_version_compatible':oracle_grid_version is search( '^(' + ( item.value.patch_files | map(attribute='target_version') | list | join ('|') ) + ')'),
+                              'database_patch_version_compatible':oracle_database_version is search( '^(' + ( item.value.patch_files | map(attribute='target_version') | list | join ('|') ) + ')'),
                               'install_request': false,
                               'install_to_grid_required':false,
                               'install_to_database_required':false,
@@ -103,6 +109,11 @@
                        }}
     with_dict: "{{ required_patches }}"
     register: tmp_patches
+
+  - name: Show It
+    debug:
+      var=item
+    with_items: "{{ tmp_patches.results | map(attribute='ansible_facts.tmp_patch') | list }}"
 
   - name: (main) Create New Patch Dictionary
     set_fact:
@@ -134,6 +145,8 @@
      include_tasks: install-patches.yml
      vars:
         patch_number: "{{ item.value.patch_number }}"
+        grid_patch_directory: "{{ item.value.grid_patch_directory }}"
+        database_patch_directory: "{{ item.value.database_patch_directory }}"
         apply_to_database: "{{ item.value.install_to_database_required }}"
         apply_to_grid: "{{ item.value.install_to_grid_required }}"
         patch_to_rollback: "{{ item.value.replaces_patch }}"

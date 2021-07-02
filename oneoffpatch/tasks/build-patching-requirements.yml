@@ -31,13 +31,47 @@
     with_dict: "{{ required_patches }}"
     when: "item.value.install_request"
 
-  - name: Download Required Patches Not Already Installed
+  # Some patches have multiple versions depending on the base DBRU level - we loop through all
+  # defined versions of the patch in the environment configuration to find the name of the
+  # file appropriate for the current version
+  - name: Create List of Patches with their Possible Patch Files
+    set_fact:
+       patch_list: "{{ ( patch_list | default([]) ) + [ {'patch_id':item.key,'patch_files':item.value.patch_files} ] }}"
+    loop: "{{ required_patches | dict2items }}"
+
+  - name: Get Grid Patch Filename
+    set_fact:
+      required_patches: "{{ required_patches | combine({item.0.patch_id: { 'grid_patch_filename': item.1.filename, 'grid_patch_directory': ( oracle_patch_installer_directory + '/' + ( item.1.filename.split('.') | first ))  } }, recursive=true) }}"
+    with_subelements: 
+    - "{{ patch_list }}"
+    - patch_files
+    when: oracle_grid_version is search('^' + item.1.target_version)
+
+  - name: Get Database Patch Filename
+    set_fact: 
+       required_patches: "{{ required_patches | combine({item.0.patch_id: {'database_patch_filename': item.1.filename, 'database_patch_directory': ( oracle_patch_installer_directory +  '/' + ( item.1.filename.split('.') | first )) } }, recursive=true) }}"
+    with_subelements: 
+    - "{{ patch_list }}"
+    - patch_files
+    when: oracle_database_version is search('^' + item.1.target_version)
+
+  - name: Download Grid Patches Not Already Installed
     include_tasks: download-patch.yml
     vars:
         patch_number: "{{item.value.patch_number}}"
-        patch_file: "{{item.value.filename}}"
+        patch_file: "{{item.value.grid_patch_filename}}"
+        patch_directory: "{{item.value.grid_patch_directory}}"
     with_dict: "{{ required_patches }}"
-    when: "item.value.install_request and (item.value.install_to_grid_required or item.value.install_to_database_required)"
+    when: "item.value.install_request and item.value.install_to_grid_required"
+
+  - name: Download Database Patches Not Already Installed
+    include_tasks: download-patch.yml
+    vars:
+        patch_number: "{{item.value.patch_number}}"
+        patch_file: "{{item.value.database_patch_filename}}"
+        patch_directory: "{{item.value.database_patch_directory}}"
+    with_dict: "{{ required_patches }}"
+    when: "item.value.install_request and item.value.install_to_database_required"
 
   - name: Initialize List of Grid Patching Requirements
     set_fact:
