@@ -102,7 +102,7 @@
 
   - name:  Determine if Database needs Shutdown from OPatch Metadata
     shell: |
-           {{ oracle_database_oracle_home }}/OPatch/opatch query {{ oracle_patch_installer_directory }}/{{ item.value.patch_number }} | grep "Need to shutdown Oracle instances" | cut -d: -f2
+           {{ oracle_database_oracle_home }}/OPatch/opatch query {{ item.value.database_patch_directory }}/{{ item.value.patch_number }} | grep "Need to shutdown Oracle instances" | cut -d: -f2
     register: tmp_database_shutdown_required
     with_dict: "{{ required_patches }}"
     when: item.value.install_request and item.value.database_patch and item.value.install_to_database_required
