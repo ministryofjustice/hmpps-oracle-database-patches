@@ -34,6 +34,13 @@
      - patch_to_replace != 'none'
      - grid_patch_replacement.stdout | bool 
 
+- name: Mark Replaced Patch {{ patch_to_replace }} Not To Be Installed On Grid Infrastructure
+  set_fact:
+      required_patches: "{{ required_patches | combine({ ( 'p' + patch_to_replace ): {'install_request':false,'install_to_grid_required':false}}, recursive=true) }}"
+  when: 
+      - grid_patch_version_compatible
+      - patch_to_replace != 'none'
+
 # -- Database
 
 - name: Check if patch {{ patch_number }} is installed on Database 
@@ -67,3 +74,10 @@
      - required_patches[patch_id].install_to_database_required
      - patch_to_replace != 'none'
      - database_patch_replacement.stdout | bool 
+
+- name: Mark Replaced Patch {{ patch_to_replace }} Not To Be Installed On Database
+  set_fact:
+      required_patches: "{{ required_patches | combine({ ( 'p' + patch_to_replace ): {'install_request':false,'install_to_database_required':false}}, recursive=true) }}"
+  when: 
+      - database_patch_version_compatible
+      - patch_to_replace != 'none'
