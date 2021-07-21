@@ -151,7 +151,7 @@
         apply_to_grid: "{{ item.value.install_to_grid_required }}"
         patch_to_rollback: "{{ item.value.replaces_patch }}"
         rollback_from_database: "{{ item.value.database_rollback_required }}"
-        rollback_from_grid: "{{ item.value.rollback_from_grid }}" 
+        rollback_from_grid: "{{ item.value.grid_rollback_required }}" 
      with_dict: "{{ required_patches }}"
      when: item.value.install_request and ((item.value.install_to_grid_required) or (item.value.install_to_database_required))
 
