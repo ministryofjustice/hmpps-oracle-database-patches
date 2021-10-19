@@ -49,6 +49,20 @@
 - name: (main) Prepare Oracle Home Version Information
   include: get-oracle-version.yml
 
+# The environment_name Ansible variable is not available in the engineering environments
+# (Do not set it in hmpps-engineering-platform-terraform as this will overwrite the
+#  specific Delius environments from hmpps-env-config in Codebuild)
+# so instead we find this value from the /etc/environment file on the host itself
+- name: (main) Get Environment Name from Target Host if Not Set
+  shell: awk -F= '/HMPPS_ENVIRONMENT/{print $NF}' /etc/environment | sed 's/"//g'
+  register: get_environment_name
+  when: environment_name is not defined
+
+- name: (main) Set Environment Name from Target Host if Not Set
+  set_fact:
+     environment_name: get_environment_name.stdout
+  when: environment_name is not defined
+
 - name: (main) Display Runtime Information
   debug:
       msg: |
