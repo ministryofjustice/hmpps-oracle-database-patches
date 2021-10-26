@@ -67,7 +67,6 @@
   debug:
       msg: |
            Environment Name          {{ environment_name }}
-           Target Host               {{ target_host }}
            Install Absent Patches    {{ install_absent_patches }}
            Oracle DB Home            {{ oracle_database_oracle_home }}
            Oracle DB Home Version    {{ oracle_database_version }}
