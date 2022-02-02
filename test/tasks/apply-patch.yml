@@ -1,5 +1,8 @@
 ---
 
+## TEST ###
+
+
 - name: Remove previous response file (use root in case left from bootstrap)
   file:
      path: /tmp/ocm.rsp 
