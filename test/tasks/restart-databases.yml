@@ -1,9 +1,0 @@
----
-
-- name: Restart all databases in the current Oracle Home
-  shell: "export ORACLE_HOME={{ oracle_database_oracle_home }}; {{ oracle_database_oracle_home }}/bin/srvctl start home -o {{ oracle_database_oracle_home }} -s {{ oracle_statefile }}"
-
-- name: Remove state file
-  file:
-     path: "{{ oracle_statefile }}"
-     state: absent
