@@ -7,3 +7,17 @@
   file:
      path: "{{ oracle_statefile }}"
      state: absent
+
+- name: Get database type
+  set_fact:
+    database_type: "{{ target_hosts.split(',')[0] | regex_replace('(^.*)_.*$','\\1') }}"
+
+- name: Set FSFO Mode
+  include_role:
+     name: hmpps-delius-oracledb-ha
+     tasks_from: set-fsfo-mode.yml
+  vars:
+     delegation_host: "{{ hostvars[groups[database_type + '_primarydb'][0]]['inventory_hostname'] }}"
+     standbydb1: "{{ database_type + '_standbydb1' }}"
+     standbydb2: "{{ database_type + '_standbydb2' }}"
+     high_availability_count: "{{ database[database_type]['high_availability_count'] }}"
