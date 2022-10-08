@@ -18,6 +18,6 @@
      tasks_from: set-fsfo-mode.yml
   vars:
      delegation_host: "{{ hostvars[groups[database_type + '_primarydb'][0]]['inventory_hostname'] }}"
-     standbydb1: "{{ database_type + '_standbydb1' }}"
-     standbydb2: "{{ database_type + '_standbydb2' }}"
+     standby1: "{{ database_type + '_standbydb1' }}"
+     standby2: "{{ database_type + '_standbydb2' }}"
      high_availability_count: "{{ database[database_type]['high_availability_count'] }}"
