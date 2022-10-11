@@ -10,10 +10,10 @@
      when: database_shutdown_needed|bool
 
     # Switch Off FSFO Mode if Enabled (including Observe-Only Mode)
-    # Run this on all databases to ensure no attempt to failover to a standby
-    # whilst it is being patched
-    - name: Switch Off FSFO
-      block:
+    # Only need to run this on the primary.
+   - name: Switch Off FSFO
+     when: group_names | select('match','.*_primarydb') | length > 0 
+     block:
 
           - name: Get FSFO Mode
             shell: |
