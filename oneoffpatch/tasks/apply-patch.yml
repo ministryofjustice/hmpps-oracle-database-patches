@@ -16,5 +16,13 @@
           cd {{ patch_directory }}/{{ patch_number }}
            {{ oracle_home }}/OPatch/opatch apply -silent
   async: 1200
-  poll: 30
+  poll: 0
   register: run_opatch
+
+- name: Wait for OPatch Install
+  async_status:
+      jid: "{{ run_opatch.ansible_job_id }}"
+  register: result
+  until: result.finished
+  retries: 40
+  delay: 30
