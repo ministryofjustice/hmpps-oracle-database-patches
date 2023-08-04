@@ -15,3 +15,5 @@
           export OPATCH_NO_FUSER=true
           cd {{ patch_directory }}/{{ patch_number }}
            {{ oracle_home }}/OPatch/opatch apply -silent
+  async: 1200
+  poll: 30
