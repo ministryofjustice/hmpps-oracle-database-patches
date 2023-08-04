@@ -17,3 +17,4 @@
            {{ oracle_home }}/OPatch/opatch apply -silent
   async: 1200
   poll: 30
+  register: run_opatch
